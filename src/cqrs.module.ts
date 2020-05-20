@@ -6,8 +6,8 @@ import { IEvent, IEventPublisher } from './interfaces';
 import { QueryBus } from './query-bus';
 import { ExplorerService } from './services/explorer.service';
 import { EVENTS_PUBLISHER_CLIENT, EVENTS_PUB_SUB } from "./constants";
-import { CqrsModuleOptions } from "./interfaces/cqrs-module-options.interface";
-import { PubSubResolver } from "./pub-sub/pub-sub-resolver";
+import { CqrsModuleOptions } from "./interfaces/";
+import { PubSubResolver } from "./pub-sub/";
 
 @Module({})
 export class CqrsModule<EventBase extends IEvent = IEvent>

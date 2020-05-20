@@ -1,6 +1,6 @@
 import { Subject } from 'rxjs';
 import { IEvent, IEventPublisher, IMessageSource } from "../../interfaces";
-import { IPublishableEvent } from "../../interfaces/events/publishable-event.interface";
+import { IPublishableEvent } from "../../interfaces";
 import { ClientKafka } from "@nestjs/microservices";
 import { EVENTS_PUBLISHER_CLIENT } from "../../constants";
 import { Inject } from "@nestjs/common";

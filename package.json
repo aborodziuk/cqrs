@@ -1,5 +1,5 @@
 {
-  "name": "@nestjs/cqrs",
+  "name": "nestjs-microservice-cqrs",
   "version": "7.0.0",
   "description": "A lightweight CQRS module for Nest framework (node.js)",
   "license": "MIT",
@@ -57,7 +57,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nestjs/cqrs"
+    "url": "https://github.com/aborodziuk/nestjs-microservice-cqrs"
   },
   "dependencies": {
     "@nestjs/microservices": "^7.0.13",
