@@ -3,7 +3,6 @@ import { ModuleRef } from '@nestjs/core';
 import 'reflect-metadata';
 import { COMMAND_HANDLER_METADATA } from './decorators/constants';
 import { CommandHandlerNotFoundException } from './exceptions/command-not-found.exception';
-import { DefaultCommandPubSub } from './helpers/default-command-pubsub';
 import { InvalidCommandHandlerException } from './index';
 import {
   ICommand,
@@ -12,6 +11,7 @@ import {
   ICommandPublisher,
 } from './interfaces/index';
 import { ObservableBus } from './utils/observable-bus';
+import { DefaultCommandPubSub } from "./pub-sub/commands/default-command-pubsub";
 
 export type CommandHandlerType = Type<ICommandHandler<ICommand>>;
 

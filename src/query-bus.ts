@@ -4,7 +4,7 @@ import 'reflect-metadata';
 import { QUERY_HANDLER_METADATA } from './decorators/constants';
 import { QueryHandlerNotFoundException } from './exceptions';
 import { InvalidQueryHandlerException } from './exceptions/invalid-query-handler.exception';
-import { DefaultQueryPubSub } from './helpers/default-query-pubsub';
+import { DefaultQueryPubSub } from "./pub-sub/queries/default-query-pubsub";
 import {
   IQuery,
   IQueryBus,
