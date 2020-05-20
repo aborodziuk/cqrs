@@ -1,11 +1,10 @@
 import { Transport } from "@nestjs/microservices";
-import { IEventPublisher } from "./events/event-publisher.interface";
 
-export interface EventsPubSubOptions<EventPublisherBase extends IEventPublisher> {
+export interface EventsPubSubOptions {
     transport: Transport;
-    clientFactory: (...args: any[]) => EventPublisherBase;
+    clientFactory: (...args: any[]) => {};
 }
 
-export interface CqrsModuleOptions<EventPublisherBase extends IEventPublisher> {
-    events: EventsPubSubOptions<EventPublisherBase>;
+export interface CqrsModuleOptions {
+    events: EventsPubSubOptions;
 }

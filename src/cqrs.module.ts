@@ -21,8 +21,7 @@ export class CqrsModule<EventBase extends IEvent = IEvent>
   ) {}
 
   static forRoot(
-    uri: string,
-    options: CqrsModuleOptions<IEventPublisher>,
+    options: CqrsModuleOptions,
   ): DynamicModule {
     const pubSubResolver = new PubSubResolver();
     const pubSubProviders = [{
