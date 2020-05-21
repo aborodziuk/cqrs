@@ -13,7 +13,7 @@ import {
   COMMANDS_PUB_SUB, COMMANDS_PUBLISHER_CLIENT
 } from "./constants";
 import { CqrsModuleOptions } from "./interfaces/";
-import { KafkaPubSub } from "./pub-sub";
+import { KafkaEventsPubSub } from "./pub-sub";
 
 @Module({})
 export class CqrsModule<
@@ -70,7 +70,7 @@ export class CqrsModule<
         EventBus,
         EventPublisher,
         ExplorerService,
-        KafkaPubSub,
+        KafkaEventsPubSub,
         ...pubSubProviders as Provider[],
         ...clientsProviders as Provider[],
       ],

@@ -6,7 +6,7 @@ import { EVENTS_PUBLISHER_CLIENT } from "../../constants";
 import { Inject } from "@nestjs/common";
 import { defaultGetEventName } from "../../helpers/default-get-event-name";
 
-export class KafkaPubSub<EventBase extends IEvent = IEvent>
+export class KafkaEventsPubSub<EventBase extends IEvent = IEvent>
     implements IEventPublisher<EventBase>, IMessageSource<EventBase> {
 
     private subject$: Subject<EventBase>;
@@ -16,18 +16,14 @@ export class KafkaPubSub<EventBase extends IEvent = IEvent>
         private readonly client: ClientKafka
     ) {}
 
-    async publish<T extends EventBase>(eventData: T): Promise<void> {
+    async publish<T extends EventBase>(pattern: string, eventData: T): Promise<void> {
         const event: IPublishableEvent<T> = {
             eventType: defaultGetEventName(eventData),
             data: eventData
         };
         console.log('publishing');
 
-        await this.client.emit('test3', event);
-    }
-
-    async publishAll<T extends EventBase>(events: T[]): Promise<void> {
-        await events.forEach((event: T) => this.publish(event));
+        await this.client.emit(pattern, event);
     }
 
     bridgeEventsTo<T extends EventBase>(subject: Subject<T>): void {

@@ -12,7 +12,8 @@ import {
   IQueryResult,
 } from './interfaces';
 import { ObservableBus } from './utils/observable-bus';
-import { QUERIES_PUB_SUB } from "./constants";
+import { QUERIES_PUB_SUB, QUERIES_PUBLISHER_CLIENT } from "./constants";
+import { IPubSubClient } from "./interfaces/pub-sub-client.interface";
 
 export type QueryHandlerType<
   QueryBase extends IQuery = IQuery,
@@ -27,10 +28,11 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
 
   constructor(
       @Inject(QUERIES_PUB_SUB) private readonly _publisher: IQueryPublisher<QueryBase>,
+      @Inject(QUERIES_PUBLISHER_CLIENT) private readonly _client: IPubSubClient,
       private readonly moduleRef: ModuleRef
   ) {
     super();
-    this._publisher.bridgeEventsTo(this.subject$);
+    this._publisher.bridgeQueriesTo(this.subject$);
   }
 
   get publisher(): IQueryPublisher<QueryBase> {
@@ -38,7 +40,18 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
   }
 
   async execute<T extends QueryBase, TResult = any>(
+    pattern: string,
     query: T,
+  ): Promise<TResult> {
+    if (this.isDefaultPubSub()) {
+      this.executeLocally(query);
+    }
+
+    return this._publisher.publish(pattern, query) as TResult;
+  }
+
+  async executeLocally<T extends QueryBase, TResult = any>(
+      query: T,
   ): Promise<TResult> {
     const queryName = this.getQueryName((query as any) as Function);
     const handler = this.handlers.get(queryName);
@@ -83,5 +96,9 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
     handler: QueryHandlerType<QueryBase>,
   ): FunctionConstructor {
     return Reflect.getMetadata(QUERY_HANDLER_METADATA, handler);
+  }
+
+  private isDefaultPubSub(): boolean {
+    return !this._client;
   }
 }

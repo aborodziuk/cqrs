@@ -47,15 +47,20 @@ export class EventBus<EventBase extends IEvent = IEvent>
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
   }
 
-  publish<T extends EventBase>(event: T) {
-    return this._publisher.publish(event);
+  publish<T extends EventBase>(pattern: string, event: T) {
+    return this._publisher.publish(pattern, event);
   }
 
-  publishAll<T extends EventBase>(events: T[]) {
-    if (this._publisher.publishAll) {
-      return this._publisher.publishAll(events);
-    }
-    return (events || []).map((event) => this._publisher.publish(event));
+  publishAll<T extends EventBase>(pattern: string, events: T[]) {
+    return events.map((event) => this.publish(pattern, event));
+  }
+
+  publishLocally<T extends EventBase>(event: T) {
+    this.subject$.next(event);
+  }
+
+  publishAllLocally<T extends EventBase>(events: T[]) {
+    return events.map((event) => this.publishLocally(event));
   }
 
   bind(handler: IEventHandler<EventBase>, name: string) {
@@ -111,7 +116,7 @@ export class EventBus<EventBase extends IEvent = IEvent>
 
     const subscription = stream$
       .pipe(filter((e) => !!e))
-      .subscribe((command) => this.commandBus.execute(command));
+      .subscribe((command) => this.commandBus.executeLocally(command));
 
     this.subscriptions.push(subscription);
   }

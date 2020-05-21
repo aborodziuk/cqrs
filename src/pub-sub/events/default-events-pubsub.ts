@@ -5,7 +5,7 @@ export class DefaultEventsPubSub<EventBase extends IEvent = IEvent>
   implements IEventPublisher<EventBase>, IMessageSource<EventBase> {
   private subject$: Subject<EventBase>;
 
-  publish<T extends EventBase>(event: T) {
+  publish<T extends EventBase>(pattern: string, event: T) {
     this.subject$.next(event);
   }
 

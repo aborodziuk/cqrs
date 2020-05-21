@@ -1,15 +1,16 @@
 import { Subject } from 'rxjs';
-import { ICommand, ICommandPublisher, IMessageSource } from '../../interfaces';
+import { ICommand, ICommandPublisher } from '../../interfaces';
+import { IMessageSource } from "../../interfaces/commands/message-source.interface";
 
 export class DefaultCommandsPubSub<CommandBase extends ICommand = ICommand>
   implements ICommandPublisher<CommandBase>, IMessageSource<CommandBase> {
   private subject$: Subject<CommandBase>;
 
-  publish<T extends CommandBase>(command: T) {
+  publish<T extends CommandBase>(pattern: string, command: T) {
     this.subject$.next(command);
   }
 
-  bridgeEventsTo<T extends CommandBase>(subject: Subject<T>): void {
+  bridgeCommandsTo<T extends CommandBase>(subject: Subject<T>): void {
     this.subject$ = subject;
   }
 }
