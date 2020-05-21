@@ -1,10 +1,9 @@
-import { Injectable, Type } from '@nestjs/common';
+import { Inject, Injectable, Type } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import 'reflect-metadata';
 import { QUERY_HANDLER_METADATA } from './decorators/constants';
 import { QueryHandlerNotFoundException } from './exceptions';
 import { InvalidQueryHandlerException } from './exceptions/invalid-query-handler.exception';
-import { DefaultQueryPubSub } from "./pub-sub/queries/default-query-pubsub";
 import {
   IQuery,
   IQueryBus,
@@ -13,6 +12,7 @@ import {
   IQueryResult,
 } from './interfaces';
 import { ObservableBus } from './utils/observable-bus';
+import { QUERIES_PUB_SUB } from "./constants";
 
 export type QueryHandlerType<
   QueryBase extends IQuery = IQuery,
@@ -24,19 +24,17 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
   extends ObservableBus<QueryBase>
   implements IQueryBus<QueryBase> {
   private handlers = new Map<string, IQueryHandler<QueryBase, IQueryResult>>();
-  private _publisher: IQueryPublisher<QueryBase>;
 
-  constructor(private readonly moduleRef: ModuleRef) {
+  constructor(
+      @Inject(QUERIES_PUB_SUB) private readonly _publisher: IQueryPublisher<QueryBase>,
+      private readonly moduleRef: ModuleRef
+  ) {
     super();
-    this.useDefaultPublisher();
+    this._publisher.bridgeEventsTo(this.subject$);
   }
 
   get publisher(): IQueryPublisher<QueryBase> {
     return this._publisher;
-  }
-
-  set publisher(_publisher: IQueryPublisher<QueryBase>) {
-    this._publisher = _publisher;
   }
 
   async execute<T extends QueryBase, TResult = any>(
@@ -85,9 +83,5 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
     handler: QueryHandlerType<QueryBase>,
   ): FunctionConstructor {
     return Reflect.getMetadata(QUERY_HANDLER_METADATA, handler);
-  }
-
-  private useDefaultPublisher() {
-    this._publisher = new DefaultQueryPubSub<QueryBase>(this.subject$);
   }
 }

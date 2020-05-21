@@ -1,9 +1,9 @@
-import { Injectable, Type } from '@nestjs/common';
+import { Inject, Injectable, Type } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import 'reflect-metadata';
 import { COMMAND_HANDLER_METADATA } from './decorators/constants';
 import { CommandHandlerNotFoundException } from './exceptions/command-not-found.exception';
-import { InvalidCommandHandlerException } from './index';
+import { COMMANDS_PUB_SUB } from './constants';
 import {
   ICommand,
   ICommandBus,
@@ -11,7 +11,7 @@ import {
   ICommandPublisher,
 } from './interfaces/index';
 import { ObservableBus } from './utils/observable-bus';
-import { DefaultCommandsPubsub } from "./pub-sub/commands/default-command-pubsub";
+import { InvalidCommandHandlerException } from "./exceptions";
 
 export type CommandHandlerType = Type<ICommandHandler<ICommand>>;
 
@@ -20,19 +20,17 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
   extends ObservableBus<CommandBase>
   implements ICommandBus<CommandBase> {
   private handlers = new Map<string, ICommandHandler<CommandBase>>();
-  private _publisher: ICommandPublisher<CommandBase>;
 
-  constructor(private readonly moduleRef: ModuleRef) {
+  constructor(
+      @Inject(COMMANDS_PUB_SUB) private readonly _publisher: ICommandPublisher<CommandBase>,
+      private readonly moduleRef: ModuleRef
+  ) {
     super();
-    this.useDefaultPublisher();
+    this._publisher.bridgeEventsTo(this.subject$);
   }
 
   get publisher(): ICommandPublisher<CommandBase> {
     return this._publisher;
-  }
-
-  set publisher(_publisher: ICommandPublisher<CommandBase>) {
-    this._publisher = _publisher;
   }
 
   execute<T extends CommandBase>(command: T): Promise<any> {
@@ -72,9 +70,5 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
 
   private reflectCommandName(handler: CommandHandlerType): FunctionConstructor {
     return Reflect.getMetadata(COMMAND_HANDLER_METADATA, handler);
-  }
-
-  private useDefaultPublisher() {
-    this._publisher = new DefaultCommandsPubsub<CommandBase>(this.subject$);
   }
 }
