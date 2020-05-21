@@ -11,7 +11,7 @@ import {
   ICommandPublisher,
 } from './interfaces/index';
 import { ObservableBus } from './utils/observable-bus';
-import { DefaultCommandPubSub } from "./pub-sub/commands/default-command-pubsub";
+import { DefaultCommandsPubsub } from "./pub-sub/commands/default-command-pubsub";
 
 export type CommandHandlerType = Type<ICommandHandler<ICommand>>;
 
@@ -75,6 +75,6 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
   }
 
   private useDefaultPublisher() {
-    this._publisher = new DefaultCommandPubSub<CommandBase>(this.subject$);
+    this._publisher = new DefaultCommandsPubsub<CommandBase>(this.subject$);
   }
 }

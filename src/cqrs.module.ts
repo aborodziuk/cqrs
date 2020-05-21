@@ -2,31 +2,38 @@ import { DynamicModule, Inject, Module, OnApplicationBootstrap } from '@nestjs/c
 import { CommandBus } from './command-bus';
 import { EventBus } from './event-bus';
 import { EventPublisher } from './event-publisher';
-import { IEvent, IEventPublisher } from './interfaces';
+import { defaultCqrsModuleOptions, ICommand, IEvent, IEventPublisher, IQuery } from './interfaces';
 import { QueryBus } from './query-bus';
 import { ExplorerService } from './services/explorer.service';
 import { EVENTS_PUBLISHER_CLIENT, EVENTS_PUB_SUB } from "./constants";
 import { CqrsModuleOptions } from "./interfaces/";
-import { PubSubResolver } from "./pub-sub/";
 
 @Module({})
-export class CqrsModule<EventBase extends IEvent = IEvent>
-  implements OnApplicationBootstrap {
+export class CqrsModule<
+    EventBase extends IEvent = IEvent,
+    QueryBase extends IQuery = IQuery,
+    CommandBase extends ICommand = ICommand,
+  >implements OnApplicationBootstrap {
+
   constructor(
     @Inject(EVENTS_PUB_SUB) private readonly eventsPubSub: IEventPublisher,
     private readonly explorerService: ExplorerService<EventBase>,
     private readonly eventsBus: EventBus<EventBase>,
-    private readonly commandsBus: CommandBus,
-    private readonly queryBus: QueryBus,
+    private readonly queryBus: QueryBus<QueryBase>,
+    private readonly commandsBus: CommandBus<CommandBase>,
   ) {}
 
-  static forRoot(
-    options: CqrsModuleOptions,
+  static forRoot<
+    EventBase extends IEvent = IEvent,
+    QueryBase extends IQuery = IQuery,
+    CommandBase extends ICommand = ICommand,
+  >(
+    options: CqrsModuleOptions<EventBase, QueryBase, CommandBase> = {},
   ): DynamicModule {
-    const pubSubResolver = new PubSubResolver();
+    options = Object.assign(defaultCqrsModuleOptions, options);
     const pubSubProviders = [{
         provide: EVENTS_PUB_SUB,
-        useClass: pubSubResolver.forEvents(options.events.transport),
+        useClass: options.events.pubSub
       }, {
         provide: EVENTS_PUBLISHER_CLIENT,
         useFactory: options.events.clientFactory,
@@ -41,10 +48,9 @@ export class CqrsModule<EventBase extends IEvent = IEvent>
         EventBus,
         EventPublisher,
         ExplorerService,
-        PubSubResolver,
         ...pubSubProviders,
       ],
-      exports: [CommandBus, QueryBus, EventBus, EventPublisher],
+      exports: [CommandBus, QueryBus, EventBus, EventPublisher, EVENTS_PUB_SUB],
     };
   }
 
@@ -52,9 +58,8 @@ export class CqrsModule<EventBase extends IEvent = IEvent>
     const services = this.explorerService.explore();
 
     this.eventsBus.register(services.eventHandlers);
-    this.eventsBus.registerSagas(services.sagas);
-
     this.commandsBus.register(services.commandHandlers);
     this.queryBus.register(services.queryHandlers);
+    this.eventsBus.registerSagas(services.sagas);
   }
 }

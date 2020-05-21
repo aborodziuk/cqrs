@@ -17,3 +17,4 @@ export * from './operators';
 export * from './pub-sub';
 export * from './query-bus';
 export * from './utils';
+export * from './constants';

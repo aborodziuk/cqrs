@@ -5,7 +5,7 @@ export interface IKafkaHeaders {
     [key: string]: Buffer;
 }
 
-export interface IKafkaMessage<EventBase extends IEvent> {
+export interface IKafkaMessage<EventBase extends IEvent = IEvent> {
     key?: Buffer | string | null;
     eventType: string;
     value: IPublishableEvent<EventBase>;

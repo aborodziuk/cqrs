@@ -9,11 +9,11 @@ import { defaultGetEventName } from "../../helpers/default-get-event-name";
 export class KafkaPubSub<EventBase extends IEvent>
     implements IEventPublisher<EventBase>, IMessageSource<EventBase> {
 
-    @Inject(EVENTS_PUBLISHER_CLIENT)
-    private readonly client: ClientKafka;
+    private subject$: Subject<EventBase>;
 
     constructor(
-        private subject$: Subject<EventBase>
+        @Inject(EVENTS_PUBLISHER_CLIENT)
+        private readonly client: ClientKafka
     ) {}
 
     async publish<T extends EventBase>(eventData: T): Promise<void> {
