@@ -7,6 +7,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc -p tsconfig.json",
+    "start:dev": "nest start --watch",
     "format": "prettier --write \"**/*.ts\"",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "prepublish:next": "npm run build",
@@ -58,9 +59,5 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/aborodziuk/nestjs-microservice-cqrs"
-  },
-  "dependencies": {
-    "@nestjs/microservices": "^7.0.13",
-    "class-transformer": "^0.2.3"
   }
 }

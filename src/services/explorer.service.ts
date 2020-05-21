@@ -3,7 +3,7 @@ import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
 import { Module } from '@nestjs/core/injector/module';
 import { ModulesContainer } from '@nestjs/core/injector/modules-container';
 import {
-  COMMAND_HANDLER_METADATA, EVENT_METADATA,
+  COMMAND_HANDLER_METADATA,
   EVENTS_HANDLER_METADATA,
   QUERY_HANDLER_METADATA,
   SAGA_METADATA,
@@ -20,24 +20,30 @@ import { CqrsOptions } from '../interfaces/cqrs-options.interface';
 export class ExplorerService<EventBase extends IEvent = IEvent> {
   constructor(private readonly modulesContainer: ModulesContainer) {}
 
+  private cqrsOptions: CqrsOptions;
+
   explore(): CqrsOptions {
+    if (this.cqrsOptions) {
+      return this.cqrsOptions;
+    }
+
     const modules = [...this.modulesContainer.values()];
-    const commandHandlers = this.flatMap<ICommandHandler>(modules, (instance) =>
+    const commands = this.flatMap<ICommandHandler>(modules, (instance) =>
       this.filterProvider(instance, COMMAND_HANDLER_METADATA),
     );
-    const queryHandlers = this.flatMap<IQueryHandler>(modules, (instance) =>
+    const queries = this.flatMap<IQueryHandler>(modules, (instance) =>
       this.filterProvider(instance, QUERY_HANDLER_METADATA),
     );
-    const eventHandlers = this.flatMap<IEventHandler<EventBase>>(modules, (instance) =>
+    const events = this.flatMap<IEventHandler<EventBase>>(modules, (instance) =>
       this.filterProvider(instance, EVENTS_HANDLER_METADATA),
     );
     const sagas = this.flatMap(modules, (instance) =>
       this.filterProvider(instance, SAGA_METADATA),
     );
-    const events = this.flatMap<IEvent>(modules, (instance) =>
-        this.filterProvider(instance, EVENT_METADATA),
-    );
-    return { commandHandlers, queryHandlers, eventHandlers, sagas, events };
+
+    console.log(commands);
+    this.cqrsOptions = { commands, queries, events, sagas };
+    return this.cqrsOptions;
   }
 
   flatMap<T>(

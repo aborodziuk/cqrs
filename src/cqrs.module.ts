@@ -87,11 +87,11 @@ export class CqrsModule<
   }
 
   onApplicationBootstrap() {
-    const services = this.explorerService.explore();
+    const { events, commands, queries, sagas } = this.explorerService.explore();
 
-    this.eventsBus.register(services.eventHandlers);
-    this.commandsBus.register(services.commandHandlers);
-    this.queryBus.register(services.queryHandlers);
-    this.eventsBus.registerSagas(services.sagas);
+    this.eventsBus.register(events);
+    this.commandsBus.register(commands);
+    this.queryBus.register(queries);
+    this.eventsBus.registerSagas(sagas);
   }
 }
