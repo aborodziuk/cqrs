@@ -4,10 +4,10 @@ import { IEventHandler } from './events/event-handler.interface';
 import { IQueryHandler } from './queries/query-handler.interface';
 import { IEvent } from "./events/event.interface";
 
-export interface CqrsOptions {
+export interface CqrsOptions<EventBase extends IEvent = IEvent> {
   eventHandlers?: Type<IEventHandler>[];
   queryHandlers?: Type<IQueryHandler>[];
   commandHandlers?: Type<ICommandHandler>[];
   sagas?: Type<any>[],
-  events: IEvent[]
+  events: EventBase[]
 }

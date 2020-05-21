@@ -1,4 +1,4 @@
-import { DynamicModule, Inject, Module, OnApplicationBootstrap } from '@nestjs/common';
+import { DynamicModule, Inject, Module, OnApplicationBootstrap, Provider } from '@nestjs/common';
 import { CommandBus } from './command-bus';
 import { EventBus } from './event-bus';
 import { EventPublisher } from './event-publisher';
@@ -33,10 +33,10 @@ export class CqrsModule<
     options = Object.assign(defaultCqrsModuleOptions, options);
     const pubSubProviders = [{
         provide: EVENTS_PUB_SUB,
-        useClass: options.events.pubSub
+        ...options.events.clientProvider
       }, {
         provide: EVENTS_PUBLISHER_CLIENT,
-        useFactory: options.events.clientFactory,
+        ...options.events.clientProvider
       },
     ];
 
@@ -48,7 +48,7 @@ export class CqrsModule<
         EventBus,
         EventPublisher,
         ExplorerService,
-        ...pubSubProviders,
+        ...pubSubProviders as Provider[],
       ],
       exports: [CommandBus, QueryBus, EventBus, EventPublisher, EVENTS_PUB_SUB],
     };

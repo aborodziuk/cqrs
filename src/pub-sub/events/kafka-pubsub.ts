@@ -6,7 +6,7 @@ import { EVENTS_PUBLISHER_CLIENT } from "../../constants";
 import { Inject } from "@nestjs/common";
 import { defaultGetEventName } from "../../helpers/default-get-event-name";
 
-export class KafkaPubSub<EventBase extends IEvent>
+export class KafkaPubSub<EventBase extends IEvent = IEvent>
     implements IEventPublisher<EventBase>, IMessageSource<EventBase> {
 
     private subject$: Subject<EventBase>;

@@ -20,14 +20,20 @@ export interface CqrsModuleOptions<
 export const defaultCqrsModuleOptions = {
     events: {
         pubSub: DefaultEventsPubSub,
-        clientFactory: () => null,
+        clientProvider: {
+            useValue: null,
+        },
     },
     queries: {
         pubSub: DefaultQueriesPubSub,
-        clientFactory: () => null,
+        clientProvider: {
+            useValue: null,
+        },
     },
     commands: {
         pubSub: DefaultCommandsPubSub,
-        clientFactory: () => null,
+        clientProvider: {
+            useValue: null,
+        },
     },
 } as CqrsModuleOptions;

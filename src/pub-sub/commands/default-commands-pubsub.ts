@@ -1,8 +1,8 @@
 import { Subject } from 'rxjs';
-import { ICommand, ICommandPublisher } from '../../interfaces';
+import { ICommand, ICommandPublisher, IMessageSource } from '../../interfaces';
 
 export class DefaultCommandsPubSub<CommandBase extends ICommand = ICommand>
-  implements ICommandPublisher<CommandBase> {
+  implements ICommandPublisher<CommandBase>, IMessageSource<CommandBase> {
   private subject$: Subject<CommandBase>;
 
   publish<T extends CommandBase>(command: T) {
