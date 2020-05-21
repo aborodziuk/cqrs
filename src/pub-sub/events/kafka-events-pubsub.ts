@@ -2,7 +2,7 @@ import { Subject } from 'rxjs';
 import { Inject } from "@nestjs/common";
 import { IEvent, IEventPublisher, IMessageSource } from "../../interfaces";
 import { IPublishableEvent } from "../../interfaces";
-import { EVENTS_PUBLISHER_CLIENT } from "../../constants";
+import { EVENTS_PUBLISHER_CLIENT, MESSAGE_TYPE_EVENT } from "../../constants";
 import { defaultGetEventName } from "../../helpers/default-get-event-name";
 import { IPubSubClient } from "../../interfaces/pub-sub-client.interface";
 
@@ -18,7 +18,8 @@ export class KafkaEventsPubSub<EventBase extends IEvent = IEvent>
 
     async publish<T extends EventBase>(pattern: string, eventData: T): Promise<void> {
         const event: IPublishableEvent<T> = {
-            eventType: defaultGetEventName(eventData),
+            messageType: MESSAGE_TYPE_EVENT,
+            className: defaultGetEventName(eventData),
             data: eventData
         };
 

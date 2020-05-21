@@ -14,6 +14,7 @@ import {
 } from "./constants";
 import { CqrsModuleOptions } from "./interfaces/";
 import { KafkaEventsPubSub } from "./pub-sub";
+import { PropagationService } from "./services/propagation.service";
 
 @Module({})
 export class CqrsModule<
@@ -71,6 +72,7 @@ export class CqrsModule<
         EventPublisher,
         ExplorerService,
         KafkaEventsPubSub,
+        PropagationService,
         ...pubSubProviders as Provider[],
         ...clientsProviders as Provider[],
       ],
@@ -79,6 +81,7 @@ export class CqrsModule<
         QueryBus,
         EventBus,
         EventPublisher,
+        PropagationService,
         ...[
           ...pubSubProviders, ...clientsProviders
         ].map(c => c.provide)

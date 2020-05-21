@@ -1,7 +1,7 @@
 import { Subject } from 'rxjs';
 import { Inject } from "@nestjs/common";
 import { IQuery, IQueryPublisher } from "../../interfaces";
-import { QUERIES_PUBLISHER_CLIENT } from "../../constants";
+import { MESSAGE_TYPE_QUERY, QUERIES_PUBLISHER_CLIENT } from "../../constants";
 import { defaultGetEventName } from "../../helpers/default-get-event-name";
 import { IPublishableQuery } from "../../interfaces/queries/publishable-query.interface";
 import { IMessageSource } from "../../interfaces/queries/message-source.interface";
@@ -12,7 +12,7 @@ export class KafkaQueriesPubSub<QueryBase extends IQuery = IQuery>
 
     private subject$: Subject<QueryBase>;
 
-    private subscribedTopics: string[];
+    private subscribedTopics: string[] = [];
 
     constructor(
         @Inject(QUERIES_PUBLISHER_CLIENT)
@@ -26,7 +26,8 @@ export class KafkaQueriesPubSub<QueryBase extends IQuery = IQuery>
         }
 
         const query: IPublishableQuery<T> = {
-            queryType: defaultGetEventName(queryData),
+            messageType: MESSAGE_TYPE_QUERY,
+            className: defaultGetEventName(queryData),
             data: queryData
         };
 

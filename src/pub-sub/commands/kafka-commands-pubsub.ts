@@ -1,18 +1,18 @@
 import { Subject } from 'rxjs';
 import { Inject } from "@nestjs/common";
 import { ICommand, ICommandPublisher } from "../../interfaces";
-import { COMMANDS_PUBLISHER_CLIENT } from "../../constants";
+import { COMMANDS_PUBLISHER_CLIENT, MESSAGE_TYPE_COMMAND } from "../../constants";
 import { defaultGetEventName } from "../../helpers/default-get-event-name";
-import { IPublishableQuery } from "../../interfaces/queries/publishable-query.interface";
 import { IMessageSource } from "../../interfaces/commands/message-source.interface";
 import { IPubSubClient } from "../../interfaces/pub-sub-client.interface";
+import { IPublishableCommand } from "../../interfaces/commands/publishable-command.interface";
 
 export class KafkaCommandsPubSub<CommandBase extends ICommand = ICommand>
     implements ICommandPublisher<CommandBase>, IMessageSource<CommandBase> {
 
     private subject$: Subject<CommandBase>;
 
-    private subscribedTopics: string[];
+    private subscribedTopics: string[] = [];
 
     constructor(
         @Inject(COMMANDS_PUBLISHER_CLIENT)
@@ -25,8 +25,9 @@ export class KafkaCommandsPubSub<CommandBase extends ICommand = ICommand>
             this.subscribedTopics.push(pattern);
         }
 
-        const command: IPublishableQuery<T> = {
-            queryType: defaultGetEventName(commandData),
+        const command: IPublishableCommand<T> = {
+            messageType: MESSAGE_TYPE_COMMAND,
+            className: defaultGetEventName(commandData),
             data: commandData
         };
 

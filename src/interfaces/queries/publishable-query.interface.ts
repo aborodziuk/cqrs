@@ -1,6 +1,7 @@
 import { IQuery } from "./query.interface";
 
 export interface IPublishableQuery<QueryBase extends IQuery = IQuery> {
-    readonly queryType: string;
+    readonly messageType: string;
+    readonly className: string;
     data: QueryBase;
 }

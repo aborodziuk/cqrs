@@ -15,6 +15,7 @@ export * from './exceptions';
 export * from './interfaces';
 export * from './operators';
 export * from './pub-sub';
+export * from './services';
 export * from './query-bus';
 export * from './utils';
 export * from './constants';

@@ -1,6 +1,7 @@
 import { ICommand } from "./command.interface";
 
 export interface IPublishableCommand<CommandBase extends ICommand = ICommand> {
-    readonly commandType: string;
+    readonly messageType: string;
+    readonly className: string;
     data: CommandBase;
 }

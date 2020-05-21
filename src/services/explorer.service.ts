@@ -41,8 +41,11 @@ export class ExplorerService<EventBase extends IEvent = IEvent> {
       this.filterProvider(instance, SAGA_METADATA),
     );
 
-    console.log(commands);
-    this.cqrsOptions = { commands, queries, events, sagas };
+    const commandDtos = commands.map(c => Reflect.getMetadata(COMMAND_HANDLER_METADATA, c));
+    const eventDtos = commands.map(e => Reflect.getMetadata(EVENTS_HANDLER_METADATA, e));
+    const queryDtos = commands.map(q => Reflect.getMetadata(QUERY_HANDLER_METADATA, q));
+
+    this.cqrsOptions = { commands, queries, events, sagas, commandDtos, eventDtos, queryDtos };
     return this.cqrsOptions;
   }
 
