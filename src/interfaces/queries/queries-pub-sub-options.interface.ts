@@ -3,7 +3,7 @@ import { IQueryPublisher } from "./query-publisher.interface";
 import { ClientProvider } from "../client-provider.interface";
 import { Constructor } from "../../event-publisher";
 
-export interface QueriesPubSubOptions<
+export interface IQueriesPubSubOptions<
     QueryBase extends IQuery = IQuery,
     PubSub extends IQueryPublisher = IQueryPublisher> {
     pubSub: Constructor<QueryBase>;

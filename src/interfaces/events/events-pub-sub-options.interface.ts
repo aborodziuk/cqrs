@@ -3,7 +3,7 @@ import { IEventPublisher } from "./event-publisher.interface";
 import { ClientProvider } from "../client-provider.interface";
 import { Constructor } from "../../event-publisher";
 
-export interface EventsPubSubOptions<
+export interface IEventsPubSubOptions<
     EventBase extends IEvent = IEvent,
     PubSub extends IEventPublisher = IEventPublisher> {
     pubSub: Constructor<PubSub>,

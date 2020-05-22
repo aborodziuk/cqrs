@@ -1,53 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+## Aktualne zachowanie
+Jeżeli używamy EventBus, CommandBus lub Query Bus, mimo że paczka jest mikroserwisem, powiedzmy Kafki
+wszystkie Eventy, Query i Komendy są przesyłane do handlerów jedynie lokalnie - nic z nich nie ląduje w Kafce.
 
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
+Również jeżeli chcemy nasłuchiwać Eventów, możemy zrobić to jedynie używając @EventPattern() który nie ma opcji
+zbindowania zwracanej wiadomości do handlera. Prawdę mówiąc, nie ma żadnej możliwości połączenia przychodzącej wiadomości
+z handlerem ( oczywiście poza ręcznym przesyłaniem i napisaniem całej obsługi )
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+By default, NestJS posiada tylko klasę DefaultPubSub, która z pomocą ObservableBus przesyła zdarzenia do handlerów.
 
-## Description
+## Proponowana zmiana
+Możliwość ustawiania oddzielnego PubSub dla Komend, Query, Eventów oraz możliwość propagowania tych zdarzeń lokalnie
+w serwisie nasłuchującym. Zamiarem jest stworzenie klas PubSub dla każdego z istniejących Transport'ów. Aktualnie napisałem
+jedynie PubSub do Kafki, ale dopisanie reszty to kwestia paru dni.
 
-A lightweight **CQRS** module for [Nest](https://github.com/kamilmysliwiec/nest) framework (node.js)
+### 1. Jak to działa 
+Link do Pull Requesta [tutaj](https://github.com/aborodziuk/nestjs-microservice-cqrs/pull/1)
 
-## Installation
 
-```bash
-$ npm install --save @nestjs/cqrs
+Proszę patrzeć jedynie na zmiany w src/ jako, że nazwę paczki zmieniłem tylko tymczasowo dla swojej wygody
+
+Wcześniej importowaliśmy CqrsModule statycznie:
+
+```typescript
+@Module({
+  imports: [
+      CqrsModule,
+  ]
+})
 ```
 
-## Quick Start
+Po zmianie importujemy moduł dynamicznie
 
-[Overview & CQRS Tutorial](https://docs.nestjs.com/recipes/cqrs)
+```typescript
+import ( CqrsModule, KafkaCommandsPubSub } from '@nestjs/cqrs';
 
-## Support
+@Module({
+  imports: [
+      CqrsModule.forRoot({
+          commands: { // albo uzupełniamy albo opuszczamy, wtedy automatycznie ładuje się DefaultCommandsPubSub
+              pubSub: KafkaCommandsPubSub, // lub RabbitMQCommandsPubSub, NatsCommandsPubSub
+              clientProvider: <tutaj Provider> // provider dla klienta kafki ( useFactory, useExisting, useValue, useClass )
+          },
+      }),
+  ]
+})
+```
+Dzięki temu, gdy tylko wykorzystamy EventBus, QueryBus lub CommandBus - wydarzenie zostanie automatycznie wyemitowane
+do Kafki lub innego pub-sub. W przypadku CommandBus oraz QueryBus zostanie zwrócony response z serwisu nasłuchującego.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+W ten sam sposób możemy ustawić "events" oraz "queries". Oczywiście możemy również nie przekazywać nic, wtedy zachowanie
+paczki nie zmieni się wcale.
 
-## Stay in touch
+Implementacje metod EventBus.publish(), QueryBus.publish() oraz CommandBus.execute() uległy zmianie i wymagają teraz
+parametru "pattern", aby klasa Pub-Sub wiedziała, gdzie ma przesłać dane zdarzenie. Jeżeli pattern będzie pusty, zdarzenie zostanie przekierowane do ObservableBus i spropagowanie jedynie lokalnie.
 
-* Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-* Website - [https://nestjs.com](https://nestjs.com/)
-* Twitter - [@nestframework](https://twitter.com/nestframework)
+```typescript
+const pattern: string = 'users';
+this.eventBus.publish(users, new UserHasRegistered());
+```
 
-## License
+Aby nadal móc publikować eventy lokalnie, dodane zostały metody publishLocally() oraz executeLocally();
 
-Nest is [MIT licensed](LICENSE).
+### Introducing PropagationService 
+
+Kolejnym problemem jest zbindowanie przychodzących zdarzeń do handlerów. Przykładowo, wykorzystując
+
+```typescript
+@EventPattern('users')
+async handle(message: any): Promise<void> {
+    console.log(message);
+}
+```
+
+Dostaniemy rozbudowany response od serwera PubSub zawierający pełno zbędnych informacji. Oczywiście "message" zawiera dane
+przesłane przez serwis wysyłający, jednak nie ma możliwości znalezienia odpowiedniego handlera.
+
+Właśnie dla tego celu stworzony został PropagationService, który automatycznie wykrywa czy był to Event, Query czy Komenda
+i propaguje wiadomość do ObservableBus, dzięki czemu odpalane są odpowiednie handlery.
+
+
+#### Serwis 1
+
+```typescript
+@Controller()
+UsersController {
+	// constructor...
+
+	@Get('users')
+	getUsers(): User[] {
+            return this.queryBus.publish<User[]>(new GetUsersQuery());
+        }
+}
+```
+
+#### Serwis 2
+
+```typescript
+import { PropagationService } from '@nestjs/cqrs';
+
+@EventPattern('users')
+async handle(message: any): Promise<any> {
+    return this.propagationService.propagate(message.value);
+}
+```
+
+Powyższy przykład zaskutkuje tym, że po wejściu na url example.com/users otrzymamy listę użytkowników z serwisu nr 2. Odpalony zostanie
+tam handler @QueryHandler(GetUsersQuery)
+
+Oczywiście same DTO Query musi zostać zdefiniowane oddzielnie w Serwisie 1 oraz Serwisie 2, jako, że są od siebie kompletnie niezależne.
