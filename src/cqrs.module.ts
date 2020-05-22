@@ -10,7 +10,8 @@ import {
   EVENTS_PUB_SUB,
   QUERIES_PUB_SUB,
   QUERIES_PUBLISHER_CLIENT,
-  COMMANDS_PUB_SUB, COMMANDS_PUBLISHER_CLIENT
+  COMMANDS_PUB_SUB,
+  COMMANDS_PUBLISHER_CLIENT,
 } from "./constants";
 import { CqrsModuleOptions } from "./interfaces/";
 import { KafkaEventsPubSub } from "./pub-sub";
@@ -24,7 +25,6 @@ export class CqrsModule<
   >implements OnApplicationBootstrap {
 
   constructor(
-    @Inject(EVENTS_PUB_SUB) private readonly eventsPubSub: IEventPublisher,
     private readonly explorerService: ExplorerService<EventBase>,
     private readonly eventsBus: EventBus<EventBase>,
     private readonly queryBus: QueryBus<QueryBase>,

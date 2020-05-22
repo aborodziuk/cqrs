@@ -27,8 +27,9 @@ export class KafkaCommandsPubSub<CommandBase extends ICommand = ICommand>
 
         const command: IPublishableCommand<T> = {
             messageType: MESSAGE_TYPE_COMMAND,
-            className: defaultGetEventName(commandData),
-            data: commandData
+            payloadType: defaultGetEventName(commandData),
+            data: commandData,
+            timestamp: new Date().getTime(),
         };
 
         return this.client.send(pattern, command);

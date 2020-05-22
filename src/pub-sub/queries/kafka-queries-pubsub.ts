@@ -27,8 +27,9 @@ export class KafkaQueriesPubSub<QueryBase extends IQuery = IQuery>
 
         const query: IPublishableQuery<T> = {
             messageType: MESSAGE_TYPE_QUERY,
-            className: defaultGetEventName(queryData),
-            data: queryData
+            payloadType: defaultGetEventName(queryData),
+            data: queryData,
+            timestamp: new Date().getTime(),
         };
 
         return this.client.send(pattern, query);

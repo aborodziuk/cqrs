@@ -23,14 +23,14 @@ export class PropagationService {
         }
 
         for (const Occurrence of this.getInternalOccurrences()) {
-            if (Occurrence.name === message.className) {
+            if (Occurrence.name === message.payloadType) {
                 switch (message.messageType) {
                     case MESSAGE_TYPE_EVENT:
-                        return this.eventBus.publishLocally(new Occurrence());
+                        return this.eventBus.publishLocally(new Occurrence(...[message.data]));
                     case MESSAGE_TYPE_COMMAND:
-                        return this.commandBus.executeLocally(new Occurrence());
+                        return this.commandBus.executeLocally(new Occurrence(...[message.data]));
                     case MESSAGE_TYPE_QUERY:
-                        return this.eventBus.publishLocally(new Occurrence());
+                        return this.queryBus.executeLocally(new Occurrence(...[message.data]));
                 }
             }
         }
@@ -40,10 +40,14 @@ export class PropagationService {
 
     private getInternalOccurrences(): Constructor<any>[] {
         const { commandDtos, eventDtos, queryDtos } = this.explorerService.explore();
-        return [...commandDtos, ...eventDtos, ...queryDtos];
+        return [
+            ...commandDtos,
+            ...eventDtos,
+            ...queryDtos
+        ];
     }
 
     private hasType(message: IncomingMessage): boolean {
-        return !(!message || !message.messageType || !message.className);
+        return !(!message || !message.messageType || !message.payloadType);
     }
 }

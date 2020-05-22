@@ -7,7 +7,7 @@ export interface IKafkaHeaders {
 
 export interface IKafkaMessage<EventBase extends IEvent = IEvent> {
     key?: Buffer | string | null;
-    className: string;
+    payloadType: string;
     messageType: string;
     value: IPublishableEvent<EventBase>;
     partition?: number;

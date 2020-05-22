@@ -11,7 +11,8 @@ import { CommandsPubSubOptions } from "./commands/commands-pub-sub-options.inter
 export interface CqrsModuleOptions<
     EventBase extends IEvent = IEvent,
     QueryBase extends IQuery = IQuery,
-    CommandBase extends ICommand = IQuery> {
+    CommandBase extends ICommand = IQuery
+> {
     events?: EventsPubSubOptions<EventBase>;
     queries?: QueriesPubSubOptions<QueryBase>;
     commands?: CommandsPubSubOptions<CommandBase>;

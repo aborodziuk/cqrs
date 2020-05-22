@@ -19,8 +19,9 @@ export class KafkaEventsPubSub<EventBase extends IEvent = IEvent>
     async publish<T extends EventBase>(pattern: string, eventData: T): Promise<void> {
         const event: IPublishableEvent<T> = {
             messageType: MESSAGE_TYPE_EVENT,
-            className: defaultGetEventName(eventData),
-            data: eventData
+            payloadType: defaultGetEventName(eventData),
+            data: eventData,
+            timestamp: new Date().getTime(),
         };
 
         await this.client.emit(pattern, event);
