@@ -48,11 +48,11 @@ export class EventBus<EventBase extends IEvent = IEvent>
   }
 
   publish<T extends EventBase>(pattern: string, event: T) {
-    return this._publisher.publish(pattern, event);
+    this._publisher.publish(pattern, event);
   }
 
   publishAll<T extends EventBase>(pattern: string, events: T[]) {
-    return events.map((event) => this.publish(pattern, event));
+    events.map((event) => this.publish(pattern, event));
   }
 
   publishLocally<T extends EventBase>(event: T) {

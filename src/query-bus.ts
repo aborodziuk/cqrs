@@ -44,7 +44,7 @@ export class QueryBus<QueryBase extends IQuery = IQuery>
     query: T,
   ): Promise<TResult> {
     if (this.isDefaultPubSub()) {
-      this.executeLocally(query);
+      return this.executeLocally(query);
     }
 
     return this._publisher.publish(pattern, query) as TResult;
