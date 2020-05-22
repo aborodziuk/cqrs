@@ -73,7 +73,7 @@ async handle(message: any): Promise<void> {
 ```
 
 Dostaniemy rozbudowany response od serwera PubSub zawierający pełno zbędnych informacji. Oczywiście "message" zawiera dane
-przesłane przez serwis wysyłający, jednak nie ma możliwości znalezienia odpowiedniego handlera.
+przesłane przez serwis wysyłający, jednak nie ma możliwości znalezienia odpowiedniego handlera ( dane to plain object ).
 
 Właśnie dla tego celu stworzony został PropagationService, który automatycznie wykrywa czy był to Event, Query czy Komenda
 i propaguje wiadomość do ObservableBus, dzięki czemu odpalane są odpowiednie handlery.
