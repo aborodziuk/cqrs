@@ -7,15 +7,21 @@ import { ICommand } from "./commands/command.interface";
 import { IEventsPubSubOptions } from "./events/events-pub-sub-options.interface";
 import { IQueriesPubSubOptions } from "./queries/queries-pub-sub-options.interface";
 import { ICommandsPubSubOptions } from "./commands/commands-pub-sub-options.interface";
+import { IEventPublisher } from "./events/event-publisher.interface";
+import { IQueryPublisher } from "./queries/query-publisher.interface";
+import { ICommandPublisher } from "./commands/command-publisher.interface";
 
 export interface CqrsModuleOptions<
+    EventsPubSubBase extends IEventPublisher<EventBase> = IEventPublisher<IEvent>,
+    QueriesPubSubBase extends IQueryPublisher<QueryBase> = IQueryPublisher<IQuery>,
+    CommandsPubSubBase extends ICommandPublisher<CommandBase> = ICommandPublisher<ICommand>,
     EventBase extends IEvent = IEvent,
     QueryBase extends IQuery = IQuery,
-    CommandBase extends ICommand = IQuery
+    CommandBase extends ICommand = ICommand,
 > {
-    events?: IEventsPubSubOptions<EventBase>;
-    queries?: IQueriesPubSubOptions<QueryBase>;
-    commands?: ICommandsPubSubOptions<CommandBase>;
+    events?: IEventsPubSubOptions<EventsPubSubBase, EventBase>;
+    queries?: IQueriesPubSubOptions<QueriesPubSubBase, QueryBase>;
+    commands?: ICommandsPubSubOptions<CommandsPubSubBase, CommandBase>;
 }
 
 export const defaultCqrsModuleOptions = {

@@ -52,7 +52,7 @@ export class EventBus<EventBase extends IEvent = IEvent>
   }
 
   publishAll<T extends EventBase>(pattern: string, events: T[]) {
-    events.map((event) => this.publish(pattern, event));
+    events.forEach((event) => this.publish(pattern, event));
   }
 
   publishLocally<T extends EventBase>(event: T) {
@@ -60,7 +60,7 @@ export class EventBus<EventBase extends IEvent = IEvent>
   }
 
   publishAllLocally<T extends EventBase>(events: T[]) {
-    return events.map((event) => this.publishLocally(event));
+    events.map((event) => this.publishLocally(event));
   }
 
   bind(handler: IEventHandler<EventBase>, name: string) {

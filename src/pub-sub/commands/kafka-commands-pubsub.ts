@@ -1,11 +1,12 @@
 import { Subject } from 'rxjs';
 import { Inject } from "@nestjs/common";
 import { ICommand, ICommandPublisher } from "../../interfaces";
-import { COMMANDS_PUBLISHER_CLIENT, MESSAGE_TYPE_COMMAND } from "../../constants";
+import { COMMANDS_PUBLISHER_CLIENT } from "../../constants";
 import { defaultGetEventName } from "../../helpers/default-get-event-name";
 import { IMessageSource } from "../../interfaces/commands/message-source.interface";
 import { IPubSubClient } from "../../interfaces/pub-sub-client.interface";
 import { IPublishableCommand } from "../../interfaces/commands/publishable-command.interface";
+import { MessageType } from "../../enums";
 
 export class KafkaCommandsPubSub<CommandBase extends ICommand = ICommand>
     implements ICommandPublisher<CommandBase>, IMessageSource<CommandBase> {
@@ -26,7 +27,7 @@ export class KafkaCommandsPubSub<CommandBase extends ICommand = ICommand>
         }
 
         const command: IPublishableCommand<T> = {
-            messageType: MESSAGE_TYPE_COMMAND,
+            messageType: MessageType.MESSAGE_TYPE_COMMAND,
             payloadType: defaultGetEventName(commandData),
             data: commandData,
             timestamp: new Date().getTime(),
@@ -35,7 +36,7 @@ export class KafkaCommandsPubSub<CommandBase extends ICommand = ICommand>
         return this.client.send(pattern, command);
     }
 
-    bridgeCommandsTo<T extends CommandBase>(subject: Subject<T>): void {
+    bridgeCommandsTo<T extends CommandBase>(subject: Subject<T>) {
         this.subject$ = subject;
     }
 }

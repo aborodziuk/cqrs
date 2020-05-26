@@ -35,7 +35,10 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
     return this._publisher;
   }
 
-  execute<T extends CommandBase>(pattern: string, command: T): Promise<any> {
+  execute<T extends CommandBase, TResult = any>(
+      pattern: string,
+      command: T,
+  ): Promise<TResult> {
     if (this.isDefaultPubSub()) {
       return this.executeLocally(command);
     }
@@ -43,7 +46,9 @@ export class CommandBus<CommandBase extends ICommand = ICommand>
     return this._publisher.publish(pattern, command);
   }
 
-  executeLocally<T extends CommandBase>(command: T): Promise<any> {
+  executeLocally<T extends CommandBase, TResult = any>(
+      command: T,
+  ): Promise<TResult> {
     const commandName = this.getCommandName(command as any);
     const handler = this.handlers.get(commandName);
     if (!handler) {

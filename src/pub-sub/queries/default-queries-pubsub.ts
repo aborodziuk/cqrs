@@ -10,7 +10,7 @@ export class DefaultQueriesPubSub<QueryBase extends IQuery = IQuery>
     this.subject$.next(query);
   }
 
-  bridgeQueriesTo<T extends QueryBase>(subject: Subject<T>): void {
+  bridgeQueriesTo<T extends QueryBase>(subject: Subject<T>) {
     this.subject$ = subject;
   }
 }

@@ -1,11 +1,12 @@
 import { Subject } from 'rxjs';
 import { Inject } from "@nestjs/common";
 import { IQuery, IQueryPublisher } from "../../interfaces";
-import { MESSAGE_TYPE_QUERY, QUERIES_PUBLISHER_CLIENT } from "../../constants";
+import { QUERIES_PUBLISHER_CLIENT } from "../../constants";
 import { defaultGetEventName } from "../../helpers/default-get-event-name";
 import { IPublishableQuery } from "../../interfaces/queries/publishable-query.interface";
 import { IMessageSource } from "../../interfaces/queries/message-source.interface";
 import { IPubSubClient } from "../../interfaces/pub-sub-client.interface";
+import { MessageType } from "../../enums";
 
 export class KafkaQueriesPubSub<QueryBase extends IQuery = IQuery>
     implements IQueryPublisher<QueryBase>, IMessageSource<QueryBase> {
@@ -26,7 +27,7 @@ export class KafkaQueriesPubSub<QueryBase extends IQuery = IQuery>
         }
 
         const query: IPublishableQuery<T> = {
-            messageType: MESSAGE_TYPE_QUERY,
+            messageType: MessageType.MESSAGE_TYPE_QUERY,
             payloadType: defaultGetEventName(queryData),
             data: queryData,
             timestamp: new Date().getTime(),
@@ -35,7 +36,7 @@ export class KafkaQueriesPubSub<QueryBase extends IQuery = IQuery>
         return this.client.send(pattern, query);
     }
 
-    bridgeQueriesTo<T extends QueryBase>(subject: Subject<T>): void {
+    bridgeQueriesTo<T extends QueryBase>(subject: Subject<T>) {
         this.subject$ = subject;
     }
 }

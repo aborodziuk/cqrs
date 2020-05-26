@@ -2,7 +2,15 @@ import { DynamicModule, Inject, Module, OnApplicationBootstrap, Provider } from 
 import { CommandBus } from './command-bus';
 import { EventBus } from './event-bus';
 import { EventPublisher } from './event-publisher';
-import { defaultCqrsModuleOptions, ICommand, IEvent, IEventPublisher, IQuery } from './interfaces';
+import {
+  defaultCqrsModuleOptions,
+  ICommand,
+  ICommandPublisher,
+  IEvent,
+  IEventPublisher,
+  IQuery,
+  IQueryPublisher
+} from './interfaces';
 import { QueryBus } from './query-bus';
 import { ExplorerService } from './services/explorer.service';
 import {
@@ -32,11 +40,14 @@ export class CqrsModule<
   ) {}
 
   static forRoot<
+    EventsPubSubBase extends IEventPublisher<EventBase> = IEventPublisher<IEvent>,
+    QueriesPubSubBase extends IQueryPublisher<QueryBase> = IQueryPublisher<IQuery>,
+    CommandsPubSubBase extends ICommandPublisher<CommandBase> = ICommandPublisher<ICommand>,
     EventBase extends IEvent = IEvent,
     QueryBase extends IQuery = IQuery,
     CommandBase extends ICommand = ICommand,
   >(
-    options: CqrsModuleOptions<EventBase, QueryBase, CommandBase> = {},
+    options: CqrsModuleOptions<EventsPubSubBase, QueriesPubSubBase, CommandsPubSubBase> = {},
   ): DynamicModule {
     options = Object.assign(defaultCqrsModuleOptions, options);
     const pubSubProviders = [{

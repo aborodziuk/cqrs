@@ -10,7 +10,7 @@ export class DefaultCommandsPubSub<CommandBase extends ICommand = ICommand>
     this.subject$.next(command);
   }
 
-  bridgeCommandsTo<T extends CommandBase>(subject: Subject<T>): void {
+  bridgeCommandsTo<T extends CommandBase>(subject: Subject<T>) {
     this.subject$ = subject;
   }
 }
